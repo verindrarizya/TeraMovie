@@ -35,7 +35,7 @@ class MovieViewModel @Inject constructor(
         viewModelScope.launch {
             movieRepository.getMovies().collect { movieList ->
                 _movieUiState.update {
-                    it.copy(movieList = movieList, isLoading = false)
+                    it.copy(movieList = movieList)
                 }
             }
         }
