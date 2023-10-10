@@ -27,7 +27,6 @@ import com.verindrarizya.teramovie.util.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,6 +38,10 @@ class MovieActivity : AppCompatActivity() {
 
     private val viewModel: MovieViewModel by viewModels()
 
+    // I directly called usecase here, because the requirement to check network and empty data
+    // then show notification during splash screen still visible. I intend to use viewmodel but it
+    // seem redundant, so i called usecase directly. At the very least i didn't break the dependency
+    // rule in clean architecture, but i am very open to any suggestion on how to tackle this problem
     @Inject
     lateinit var movieUseCase: MovieUseCase
 
@@ -77,6 +80,7 @@ class MovieActivity : AppCompatActivity() {
         }
 
         setUpRecyclerView()
+        setUpSwipeRefresh()
         observeUiState()
         observeMessage()
     }
@@ -89,12 +93,19 @@ class MovieActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.fetchMovies()
+            binding.swipeRefresh.isRefreshing = false
+        }
+    }
+
     private fun observeUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movieUiState.collect {
                     showLoadingIndicator(it.isLoading)
-
+                    showEmptyView(it.isLoading, it.movieList.isEmpty())
                     movieAdapter.submitList(it.movieList)
                 }
             }
@@ -114,6 +125,10 @@ class MovieActivity : AppCompatActivity() {
     private fun showLoadingIndicator(isLoading: Boolean) {
         binding.progressBar.isVisible = isLoading
         binding.rvMovie.isVisible = !isLoading
+    }
+
+    private fun showEmptyView(isLoading: Boolean, isEmpty: Boolean) {
+        binding.tvEmptyStatement.isVisible = !isLoading && isEmpty
     }
 
     private fun isNetworkConnected(): Boolean {
@@ -139,7 +154,7 @@ class MovieActivity : AppCompatActivity() {
     private fun splashScreenCondition(splashScreen: SplashScreen) {
         splashScreen.setKeepOnScreenCondition { true }
 
-        runBlocking {
+        lifecycleScope.launch {
             val movieData = movieUseCase.getMovies().first()
 
             if (!isNetworkConnected() && movieData.isEmpty()) {
