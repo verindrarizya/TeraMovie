@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.verindrarizya.teramovie.domain.usecase.MovieUseCase
@@ -51,12 +52,21 @@ class MovieFetchUpdateService : Service() {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val movieFetchUpdateServiceIntent = Intent(context, MovieFetchUpdateService::class.java)
 
-            val pendingIntent = PendingIntent.getService(
-                context,
-                0,
-                movieFetchUpdateServiceIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
+            val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.getService(
+                    context,
+                    0,
+                    movieFetchUpdateServiceIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            } else {
+                PendingIntent.getService(
+                    context,
+                    0,
+                    movieFetchUpdateServiceIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            }
 
             val initialDelay = System.currentTimeMillis() + 60_000
 
