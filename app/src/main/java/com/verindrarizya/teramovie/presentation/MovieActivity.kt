@@ -1,5 +1,9 @@
 package com.verindrarizya.teramovie.presentation
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -7,10 +11,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.verindrarizya.teramovie.databinding.ActivityMovieBinding
 import com.verindrarizya.teramovie.service.MovieFetchUpdateService
+import com.verindrarizya.teramovie.util.BroadcastConstant
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -25,9 +31,20 @@ class MovieActivity : AppCompatActivity() {
 
     private val movieAdapter: MovieAdapter = MovieAdapter()
 
+    private val movieFetchUpdateBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            Snackbar.make(binding.root, "Saved Movies Is Updated", Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            movieFetchUpdateBroadcastReceiver,
+            IntentFilter(BroadcastConstant.FETCH_MOVIE_UPDATED)
+        )
 
         if (savedInstanceState == null) {
             MovieFetchUpdateService.scheduleRepeatingEveryMinute(this)
@@ -71,5 +88,11 @@ class MovieActivity : AppCompatActivity() {
     private fun showLoadingIndicator(isLoading: Boolean) {
         binding.progressBar.isVisible = isLoading
         binding.rvMovie.isVisible = !isLoading
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(movieFetchUpdateBroadcastReceiver)
+        super.onDestroy()
     }
 }

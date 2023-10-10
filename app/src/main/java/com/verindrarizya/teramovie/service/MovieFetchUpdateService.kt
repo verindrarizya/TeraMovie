@@ -6,8 +6,9 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.verindrarizya.teramovie.data.repository.MovieRepository
+import com.verindrarizya.teramovie.util.BroadcastConstant
 import com.verindrarizya.teramovie.util.Result
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -30,17 +31,11 @@ class MovieFetchUpdateService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("WorkTag", "onStartCommand: called")
         scope.launch {
             val result = movieRepository.fetchMovies()
-            when (result) {
-                is Result.Failed -> {
-                    Log.d("WorkTag", "service fetch movie: failed")
-                }
-
-                is Result.Success -> {
-                    Log.d("WorkTag", "service fetch movie: success")
-                }
+            if (result is Result.Success) {
+                LocalBroadcastManager.getInstance(this@MovieFetchUpdateService)
+                    .sendBroadcast(Intent(BroadcastConstant.FETCH_MOVIE_UPDATED))
             }
         }
         return START_STICKY
@@ -53,7 +48,6 @@ class MovieFetchUpdateService : Service() {
 
     companion object {
         fun scheduleRepeatingEveryMinute(context: Context) {
-            Log.d("WorkTag", "scheduleRepeatingEveryMinute: called")
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val movieFetchUpdateServiceIntent = Intent(context, MovieFetchUpdateService::class.java)
 
@@ -64,9 +58,11 @@ class MovieFetchUpdateService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
 
+            val initialDelay = System.currentTimeMillis() + 60_000
+
             alarmManager.setRepeating(
                 AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(),
+                initialDelay,
                 60_000,
                 pendingIntent
             )
