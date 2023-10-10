@@ -14,9 +14,16 @@ object NotificationHelper {
     const val NEW_MOVIE_DATA_CHANNEL_NAME = "New Movie Data"
     const val NEW_MOVIE_DATA_CHANNEL_DESC = "New Movie Data Channel Description"
 
+    const val STATUS_NOTIFICATION_ID = 2
+    const val STATUS_CHANNEL_ID = "STATUS_CHANNEL_ID"
+    const val STATUS_CHANNEL_NAME = "Status connection & data"
+    const val STATUS_CHANNEL_DESC = "Check connection & data movie"
+
     fun createNotification(
         context: Context,
         notificationId: Int,
+        contentTitle: String,
+        contentText: String,
         channelId: String,
         channelName: String,
         channelDescription: String = "",
@@ -24,8 +31,8 @@ object NotificationHelper {
     ) {
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle("New Data Is Available")
-            .setContentText("Come and see newest movie!")
+            .setContentTitle(contentTitle)
+            .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
