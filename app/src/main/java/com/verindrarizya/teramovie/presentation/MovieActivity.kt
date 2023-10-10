@@ -10,6 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.verindrarizya.teramovie.databinding.ActivityMovieBinding
+import com.verindrarizya.teramovie.service.MovieFetchUpdateService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -27,6 +28,10 @@ class MovieActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        if (savedInstanceState == null) {
+            MovieFetchUpdateService.scheduleRepeatingEveryMinute(this)
+        }
 
         setUpRecyclerView()
         observeUiState()
