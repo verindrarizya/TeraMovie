@@ -3,7 +3,7 @@ package com.verindrarizya.teramovie.data.source.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.verindrarizya.teramovie.data.model.Movie
+import com.verindrarizya.teramovie.domain.entity.Movie
 
 @Entity(tableName = "movie")
 data class MovieEntity(
@@ -35,7 +35,7 @@ data class MovieEntity(
     @ColumnInfo(name = "overview")
     val overview: String
 ) {
-    fun mapToModel(): Movie = Movie(
+    fun mapToDomain(): Movie = Movie(
         id = id,
         title = title,
         posterPath = posterPath,
@@ -48,7 +48,7 @@ data class MovieEntity(
     )
 
     companion object {
-        fun fromModel(movie: Movie): MovieEntity =
+        fun fromDomain(movie: Movie): MovieEntity =
             MovieEntity(
                 id = movie.id,
                 title = movie.title,

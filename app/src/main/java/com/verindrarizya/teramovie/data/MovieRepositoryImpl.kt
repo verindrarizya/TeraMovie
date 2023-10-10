@@ -1,9 +1,10 @@
-package com.verindrarizya.teramovie.data.repository
+package com.verindrarizya.teramovie.data
 
-import com.verindrarizya.teramovie.data.model.Movie
 import com.verindrarizya.teramovie.data.source.local.MovieLocalDataSource
 import com.verindrarizya.teramovie.data.source.remote.MovieRemoteDataSource
 import com.verindrarizya.teramovie.data.source.remote.api.ApiResponse
+import com.verindrarizya.teramovie.domain.entity.Movie
+import com.verindrarizya.teramovie.domain.repository.MovieRepository
 import com.verindrarizya.teramovie.util.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,7 @@ class MovieRepositoryImpl @Inject constructor(
 ) : MovieRepository {
     override fun getMovies(): Flow<List<Movie>> {
         return movieLocalDataSource.getMovies()
-            .map { it.map { movieEntity -> movieEntity.mapToModel() } }
+            .map { it.map { movieEntity -> movieEntity.mapToDomain() } }
     }
 
     override suspend fun fetchMovies(): Result<String> {

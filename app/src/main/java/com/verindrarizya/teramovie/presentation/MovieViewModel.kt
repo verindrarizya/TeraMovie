@@ -2,7 +2,7 @@ package com.verindrarizya.teramovie.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.verindrarizya.teramovie.data.repository.MovieRepository
+import com.verindrarizya.teramovie.domain.usecase.MovieUseCase
 import com.verindrarizya.teramovie.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MovieViewModel @Inject constructor(
-    private val movieRepository: MovieRepository
+    private val movieUseCase: MovieUseCase
 ) : ViewModel() {
 
     private val _movieUiState: MutableStateFlow<MovieUiState> = MutableStateFlow(MovieUiState())
@@ -33,7 +33,7 @@ class MovieViewModel @Inject constructor(
 
     private fun getMovies() {
         viewModelScope.launch {
-            movieRepository.getMovies().collect { movieList ->
+            movieUseCase.getMovies().collect { movieList ->
                 _movieUiState.update {
                     it.copy(movieList = movieList)
                 }
@@ -44,7 +44,7 @@ class MovieViewModel @Inject constructor(
     fun fetchMovies() {
         _movieUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = movieRepository.fetchMovies()
+            val result = movieUseCase.fetchMovies()
             when (result) {
                 is Result.Failed -> {
                     _movieUiState.update { it.copy(isLoading = false) }

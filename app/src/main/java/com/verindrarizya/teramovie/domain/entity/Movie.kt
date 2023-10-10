@@ -1,4 +1,4 @@
-package com.verindrarizya.teramovie.data.model
+package com.verindrarizya.teramovie.domain.entity
 
 data class Movie(
     val id: Int,

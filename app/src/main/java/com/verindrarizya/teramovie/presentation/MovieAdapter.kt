@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.verindrarizya.teramovie.data.model.Movie
 import com.verindrarizya.teramovie.databinding.ItemMovieBinding
+import com.verindrarizya.teramovie.domain.entity.Movie
 
 class MovieAdapter : ListAdapter<Movie, MovieAdapter.MovieViewHolder>(DIFF_CALLBACK) {
     companion object {

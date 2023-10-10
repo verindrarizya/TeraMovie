@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.verindrarizya.teramovie.data.repository.MovieRepository
+import com.verindrarizya.teramovie.domain.usecase.MovieUseCase
 import com.verindrarizya.teramovie.util.BroadcastConstant
 import com.verindrarizya.teramovie.util.Result
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +24,7 @@ class MovieFetchUpdateService : Service() {
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     @Inject
-    lateinit var movieRepository: MovieRepository
+    lateinit var movieUseCase: MovieUseCase
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -32,7 +32,7 @@ class MovieFetchUpdateService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         scope.launch {
-            val result = movieRepository.fetchMovies()
+            val result = movieUseCase.fetchMovies()
             if (result is Result.Success) {
                 LocalBroadcastManager.getInstance(this@MovieFetchUpdateService)
                     .sendBroadcast(Intent(BroadcastConstant.FETCH_MOVIE_UPDATED))
