@@ -47,13 +47,13 @@ class MovieViewModel @Inject constructor(
             val result = movieUseCase.fetchMovies()
             when (result) {
                 is Result.Failed -> {
-                    _movieUiState.update { it.copy(isLoading = false) }
                     _message.emit(result.exception.message ?: "Something went wrong")
+                    _movieUiState.update { it.copy(isLoading = false) }
                 }
 
                 is Result.Success -> {
-                    _movieUiState.update { it.copy(isLoading = false) }
                     _message.emit(result.data)
+                    _movieUiState.update { it.copy(isLoading = false) }
                 }
             }
         }

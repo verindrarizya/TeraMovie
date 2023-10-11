@@ -7,9 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.verindrarizya.teramovie.domain.usecase.MovieUseCase
 import com.verindrarizya.teramovie.util.BroadcastConstant
+import com.verindrarizya.teramovie.util.NotificationHelper
 import com.verindrarizya.teramovie.util.Result
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -37,14 +39,25 @@ class MovieFetchUpdateService : Service() {
             if (result is Result.Success) {
                 LocalBroadcastManager.getInstance(this@MovieFetchUpdateService)
                     .sendBroadcast(Intent(BroadcastConstant.FETCH_MOVIE_UPDATED))
+
+                NotificationHelper.createNotification(
+                    context = applicationContext,
+                    notificationId = NotificationHelper.NEW_MOVIE_DATA_NOTIFICATION_ID,
+                    channelId = NotificationHelper.NEW_MOVIE_DATA_CHANNEL_ID,
+                    channelName = NotificationHelper.NEW_MOVIE_DATA_CHANNEL_NAME,
+                    channelDescription = NotificationHelper.NEW_MOVIE_DATA_CHANNEL_DESC,
+                    timeOut = 5_000L,
+                    contentTitle = "New Data Is Available",
+                    contentText = "Come and see newest movie!"
+                )
             }
         }
         return START_STICKY
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         job.cancel()
+        super.onDestroy()
     }
 
     companion object {
