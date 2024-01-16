@@ -2,7 +2,7 @@
 Teravin Android Coding Challenge
 
 ## About
-Test Coding dari PT Teravin, membuat aplikasi android native (kotlin) sederhana)
+Test Coding Challenge, membuat aplikasi android native (kotlin) sederhana)
 
 ## Requirement
 - The minimum SDK supported is API 21.
